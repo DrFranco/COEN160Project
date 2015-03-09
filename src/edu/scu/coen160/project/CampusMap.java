@@ -1,6 +1,8 @@
 package edu.scu.coen160.project;
 
+import java.util.ArrayList;
+
 public class CampusMap {
-	Card []userCards;
-	UserProfile []users;
+	ArrayList<Card> userCards;
+	ArrayList<UserProfile> users;
 }

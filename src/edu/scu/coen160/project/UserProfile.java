@@ -40,17 +40,17 @@ public class UserProfile implements ActionListener{
 		funds = num;
 	}
 	
-	boolean makePurchase(double amt, Card c) {
+	boolean makePurchase(SnackItem food, Card c) {
 		if (userCard.equals(c)){
-			funds-=amt;
+			funds-=food.price;
 			return true;
 		}
 		else
 			return false;
 	}
-	boolean makePurchase(double amt, int num, String pass) {
+	boolean makePurchase(SnackItem food, int num, String pass) {
 		if (userCard.checkPassword(num, pass)){
-			funds-=amt;
+			funds-=food.price;
 			return true;
 		}
 		else

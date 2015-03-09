@@ -1,17 +1,26 @@
 package edu.scu.coen160.project;
 
+import java.util.ArrayList;
+
 public class Cafe {
-	FoodItem []stock;
+	ArrayList<FoodItem> stock;
 	
 	
 	public boolean orderFood(UserProfile user, FoodItem food, Card card) {
-		double amt = food.price;
-		if(user.makePurchase(amt, card)){
-			
+		if(user.makePurchase(food, card)){
+			stock.remove(food);
+			return true;
 		}
+		else
+			return false;
 	}
 	
 	public boolean orderFood(UserProfile user, FoodItem food, int num, String pass) {
-		double amt
+		if(user.makePurchase(food, num, pass)){
+			stock.remove(food);
+			return true;
+		}
+		else
+			return false;
 	}
 }
