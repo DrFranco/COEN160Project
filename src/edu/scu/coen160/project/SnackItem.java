@@ -13,4 +13,9 @@ public class SnackItem {
 	
 	public SnackItem() {
 	}
+	
+	@Override
+	public String toString() {
+		return name + " $"+price+"\tcal:"+calories;
+	}
 }

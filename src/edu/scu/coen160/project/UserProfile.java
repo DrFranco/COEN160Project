@@ -8,40 +8,45 @@ import javax.swing.Timer;
 
 public class UserProfile extends Observable implements ActionListener {
 	Card userCard;
+	double budget;
 	double funds;
 	boolean fundsSet = false;
 	int dailyCalories;
+	int caloriesRemaining;
 	boolean dailyCaloriesSet = false;
 	String otherFoodPrefs = "";
 	double expenses;
 	int caloriesToday = 0;
-	Timer timer;
+	Timer timer1, timer2;
 
 	UserProfile() {
-		timer = new Timer(86400000, this);
-
+		timer1 = new Timer(86400000, this);
+		timer2 = new Timer(30*86400000,this);
 		expenses = 0;
 		userCard = new Card();
 
-		timer.start();
+		timer1.start();
+		//timer2.start();
 	}
 
 	UserProfile(int num, String pass) {
-		timer = new Timer(86400000, this);
-
+		timer1 = new Timer(86400000, this);
+		timer2 = new Timer(30*86400000,this);
 		expenses = 0;
 		userCard = new Card(num, pass);
 
-		timer.start();
+		timer1.start();
+		//timer2.start();
 	}
 	
 	UserProfile(Card c) {
-		timer = new Timer(86400000, this);
-
+		timer1 = new Timer(86400000, this);
+		timer2 = new Timer(30*86400000,this);
 		expenses = 0;
 		userCard = c;
 
-		timer.start();
+		timer1.start();
+		//timer2.start();
 	}
 
 	void addCaloricPreferences(int num) {
@@ -50,6 +55,7 @@ public class UserProfile extends Observable implements ActionListener {
 			dailyCaloriesSet = false;
 		}
 		dailyCalories = num;
+		caloriesRemaining = num;
 		dailyCaloriesSet = true;
 		setChanged();
 		notifyObservers();
@@ -57,14 +63,20 @@ public class UserProfile extends Observable implements ActionListener {
 
 	void addFunds(double num) {
 		funds = num;
+		budget = num;
 		fundsSet = true;
+		//timer2.start();
 		setChanged();
 		notifyObservers();
 	}
 
 	boolean makePurchase(SnackItem food, Card c) {
 		if (userCard.equals(c)) {
-			funds -= food.price;
+			if(fundsSet)
+				funds -= food.price;
+			expenses += food.price;
+			if(dailyCaloriesSet)
+				caloriesRemaining-= food.calories;
 			caloriesToday += food.calories;
 			setChanged();
 			notifyObservers();
@@ -75,7 +87,11 @@ public class UserProfile extends Observable implements ActionListener {
 
 	boolean makePurchase(SnackItem food, int num, String pass) {
 		if (userCard.checkPassword(num, pass)) {
-			funds -= food.price;
+			if(fundsSet)
+				funds -= food.price;
+			expenses += food.price;
+			if(dailyCaloriesSet)
+				caloriesRemaining-= food.calories;
 			caloriesToday += food.calories;
 			setChanged();
 			notifyObservers();
@@ -94,8 +110,16 @@ public class UserProfile extends Observable implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent arg) {
-		if (arg.getSource() == timer) {
+		if (arg.getSource() == timer1) {
 			caloriesToday = 0;
+			if(dailyCaloriesSet)
+				caloriesRemaining = dailyCalories;
+		}
+		if(arg.getSource() == timer2)
+		{
+			expenses =0;
+			if(fundsSet)
+				funds = budget;
 		}
 		setChanged();
 		notifyObservers();
@@ -103,7 +127,14 @@ public class UserProfile extends Observable implements ActionListener {
 
 	public String fundsToString() {
 		if (fundsSet)
-			return "" + funds;
+			return String.format("%.2f", funds);
+		else
+			return "not set";
+	}
+	
+	public String budgetToString() {
+		if (fundsSet)
+			return String.format("%.2f", budget);
 		else
 			return "not set";
 	}
@@ -111,6 +142,13 @@ public class UserProfile extends Observable implements ActionListener {
 	public String dailyCaloriesToString() {
 		if (dailyCaloriesSet)
 			return "" + dailyCalories;
+		else
+			return "not set";
+	}
+	
+	public String caloriesRemainingToString() {
+		if (dailyCaloriesSet)
+			return "" + caloriesRemaining;
 		else
 			return "not set";
 	}

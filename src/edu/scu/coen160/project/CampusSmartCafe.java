@@ -28,14 +28,33 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			viewDiet, logOut;
 	JPanel optionsPanel;
 
-	JLabel num, funds, expenses, dayCal, calTod, otherPref;
+	JLabel num, budget, funds, expenses, dayCal, calRem, calTod, otherPref, location, timeLeft;
 	DetailsPanel detailPanel;
+	
+	Timer timer;
+
+	Component r1;
+	Component r2;
+
+	Cafe cafe1, cafe2, cafe3, cafe4;
+	VendingMachine vending1,vending2,vending3,vending4,vending5,vending6,vending7,vending8;
+
+	// GraphView graphPanel;
 
 	public CampusSmartCafe() {
 		super("CampusSmartCafe");
+		
+		cafe1 = new Cafe();
+		cafe1.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
+		
+		vending1 = new VendingMachine();
+		vending1.stock.add(new SnackItem("Skittles", 1.29,150));
+		
 		numbers = new ArrayList<Integer>();
 		users = new ArrayList<UserProfile>();
 		userCards = new ArrayList<Card>();
+		
+		timer = new Timer(1000, this);
 		// create map(buttons) map done, still need buttons
 		generateMap();
 		// create output panel
@@ -77,25 +96,42 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		detailPanel.setLayout(new GridLayout(0, 1));
 		detailPanel.setBorder(new TitledBorder("User information"));
 		num = new JLabel("No user currently logged in");
+		budget = new JLabel("");
 		funds = new JLabel("");
 		expenses = new JLabel("");
 		dayCal = new JLabel("");
+		calRem = new JLabel("");
 		calTod = new JLabel("");
 		otherPref = new JLabel("");
-		otherPref.setMaximumSize(new Dimension(20,0));
+		location = new JLabel("");
+		timeLeft = new JLabel("");
+		otherPref.setMaximumSize(new Dimension(20, 0));
 		detailPanel.add(num);
+		detailPanel.add(budget);
 		detailPanel.add(funds);
 		detailPanel.add(expenses);
 		detailPanel.add(dayCal);
+		detailPanel.add(calRem);
 		detailPanel.add(calTod);
 		detailPanel.add(otherPref);
+		detailPanel.add(location);
+		detailPanel.add(timeLeft);
+		//
+		// graphPanel = new GraphView();
+		// graphPanel.add(blankSpace());
+		// graphPanel.add(blankSpace());
+		// graphPanel.add(blankSpace());
+		// graphPanel.add(blankSpace());
+		// graphPanel.setBorder(new TitledBorder("Graphs"));
+		// graphPanel.setBounds(new Rectangle(500,500));
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
-		contentPane.add(mapPanel,BorderLayout.WEST);
-		contentPane.add(optionsPanel,BorderLayout.EAST);
-		contentPane.add(detailPanel,BorderLayout.SOUTH);
+		contentPane.add(mapPanel, BorderLayout.WEST);
+		contentPane.add(optionsPanel, BorderLayout.EAST);
+		contentPane.add(detailPanel, BorderLayout.SOUTH);
+		// contentPane.add(graphPanel, BorderLayout.NORTH);
 
 		pack();
 	}
@@ -108,8 +144,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg) {
-		// TODO Auto-generated method stub
-
 		if (arg.getSource() == newUser) {
 			createAccount();
 		}
@@ -119,33 +153,120 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		if (arg.getSource() == enterFunds) {
 			fundHandler();
 		}
-		if(arg.getSource() == enterCal){
+		if (arg.getSource() == enterCal) {
 			calHandler();
 		}
-		if(arg.getSource()==enterOther){
+		if (arg.getSource() == enterOther) {
 			otherHandler();
 		}
-		if(arg.getSource()==viewExp){
+		if (arg.getSource() == viewExp) {
 			expHandler();
 		}
-		if(arg.getSource()==viewDiet){
+		if (arg.getSource() == viewDiet) {
 			dietHandler();
+		}
+		if (arg.getSource() == timer) {
+			incrementClock();
 		}
 
 		if (arg.getSource() == logOut) {
 			logOut();
+		} else {
+			selectHandler(arg.getSource());
 		}
 	}
 	
-	private void expHandler(){
-		
+	private void incrementClock() {
+		if (timeLeft.getText() == "Ready") {
+			timer.stop();
+		} else {
+			String[] fields = timeLeft.getText().split(":");
+			int minutes = Integer.parseInt(fields[0].trim());
+			int seconds = Integer.parseInt(fields[1].trim());
+			if (seconds != 0) {
+				seconds--;
+			} else if (minutes != 0) {
+				seconds = 59;
+				minutes--;
+			} else {
+				timeLeft.setText("Ready");
+				return;
+			}
+			String output = "" + minutes + ":" + String.format("%02d", seconds);
+			timeLeft.setText(output);
+		}
 	}
+
+	private void selectHandler(Object o) {
+		if (o == c1 || o == c2 || o == c3 || o == c4 || o == c5)
+			cafeHandler(o);
+		else
+			vendingHandler(o);
+	}
+
+	private void cafeHandler(Object o) {
+		if (currentUser == null) {
+			JOptionPane.showMessageDialog(getFrames()[0],
+					"You have to log in first!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			logIn();
+		} else {
+			if (o == c1) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						cafe1.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe1.orderFood(currentUser, cafe1.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe1.names.get(str).cookingTime+":00");
+				timer.start();
+			}
+		}
+	}
+
+	private void vendingHandler(Object o) {
+		if (currentUser == null) {
+			JOptionPane.showMessageDialog(getFrames()[0],
+					"You have to log in first!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			logIn();
+		} else {
+			if (o == v1) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending1.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe1.orderFood(currentUser, cafe1.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe1.names.get(str).cookingTime+":00");
+				timer.start();
+			}
+		}
+	}
+
+	private void expHandler() {
+		//graph expenses
+	}
+
 	private void dietHandler() {
-		
+		//graph dietary profile
 	}
-	
-	
-	private void otherHandler(){
+
+	private void otherHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"You have to log in first!", "Error",
@@ -154,27 +275,26 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		} else {
 			String str = JOptionPane.showInputDialog(getFrames()[0],
 					"Any other dietary restrictions?");
-				try {
-					if (str == null || (str != null && ("".equals(str)))) {
-						throw new Exception();
-					}
-				} catch (Exception e) {
-					return;
+			try {
+				if (str == null || (str != null && ("".equals(str)))) {
+					throw new Exception();
 				}
-				
+			} catch (Exception e) {
+				return;
+			}
+
 			currentUser.addOtherFoodPrefs(str);
-			System.out.println(currentUser.fundsToString());
 		}
 	}
-	
-	private void calHandler(){
+
+	private void calHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"You have to log in first!", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			logIn();
 		} else {
-			int number =-1;
+			int number = -1;
 			String str = JOptionPane.showInputDialog(getFrames()[0],
 					"How many calories per day do you want?");
 			try {
@@ -188,23 +308,22 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				number = Integer.parseInt(str);
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(getFrames()[0],
-						"Invalid number", "Calories error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(getFrames()[0], "Invalid number",
+						"Calories error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			currentUser.addCaloricPreferences(number);
 		}
 	}
-	
-	private void fundHandler(){
+
+	private void fundHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"You have to log in first!", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			logIn();
 		} else {
-			double number =200.0;
+			double number = 200.0;
 			String str = JOptionPane.showInputDialog(getFrames()[0],
 					"How many funds per month do you have?");
 			try {
@@ -218,9 +337,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				number = Double.parseDouble(str);
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(getFrames()[0],
-						"Invalid number", "Funds error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(getFrames()[0], "Invalid number",
+						"Funds error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			currentUser.addFunds(number);
@@ -320,7 +438,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			System.out.println("booooogig");
 			return;
 		}
 		UserProfile check = new UserProfile(number, pass);
@@ -328,7 +445,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			currentUser = users.get(users.indexOf(check));
 			detailPanel.setCurrent(currentUser);
 		}
-
 	}
 
 	// ugly long generation of map, but works fine
@@ -341,108 +457,89 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		v1.addActionListener(this);
 		mapPanel.add(v1);
 
-		for (int i = 0; i < 5; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(5);
 
-		c1 = new JButton("Cafe");
+		c1 = new JButton("Soup Stop");
 		c1.addActionListener(this);
 		mapPanel.add(c1);
 
-		for (int i = 0; i < 5; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(5);
 
-		c2 = new JButton("Cafe");
+		c2 = new JButton("Lazy Bone");
 		c2.addActionListener(this);
 		mapPanel.add(c2);
 
-		mapPanel.add(blankSpace());
+		blankSpace(1);
 
 		v2 = new JButton("Vending");
 		v2.addActionListener(this);
 		mapPanel.add(v2);
 
-		for (int i = 0; i < 3; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(3);
 
 		v3 = new JButton("Vending");
 		v3.addActionListener(this);
 		mapPanel.add(v3);
 
-		for (int i = 0; i < 12; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(12);
 
 		v4 = new JButton("Vending");
 		v4.addActionListener(this);
 		mapPanel.add(v4);
 
-		for (int i = 0; i < 3; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(3);
 
-		c3 = new JButton("Cafe");
+		c3 = new JButton("Selvester's");
 		c3.addActionListener(this);
 		mapPanel.add(c3);
 
-		mapPanel.add(blankSpace());
+		blankSpace(1);
 
 		v5 = new JButton("Vending");
 		v5.addActionListener(this);
 		mapPanel.add(v5);
 
-		for (int i = 0; i < 5; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(5);
 
 		v6 = new JButton("Vending");
 		v6.addActionListener(this);
 		mapPanel.add(v6);
 
-		for (int i = 0; i < 11; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(11);
 
-		c4 = new JButton("Cafe");
+		c4 = new JButton("Snaxson");
 		c4.addActionListener(this);
 		mapPanel.add(c4);
 
-		for (int i = 0; i < 6; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(6);
 
 		v7 = new JButton("Vending");
 		v7.addActionListener(this);
 		mapPanel.add(v7);
 
-		for (int i = 0; i < 11; i++) {
-			mapPanel.add(blankSpace());
-		}
-		c5 = new JButton("Cafe");
+		blankSpace(11);
+
+		c5 = new JButton("Meat Shack");
 		c5.addActionListener(this);
 		mapPanel.add(c5);
 
-		for (int i = 0; i < 6; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(6);
 
 		v8 = new JButton("Vending");
 		v8.addActionListener(this);
 		mapPanel.add(v8);
 
-		for (int i = 0; i < 18; i++) {
-			mapPanel.add(blankSpace());
-		}
+		blankSpace(18);
 	}
 
-	private JButton blankSpace() {
-		JButton button = new JButton();
-		button.setOpaque(false);
-		button.setContentAreaFilled(false);
-		button.setBorderPainted(false);
-		return button;
+	private void blankSpace(int num) {
+		for (int i = 0; i < num; i++) {
+			JButton button = new JButton();
+			button.setOpaque(false);
+			button.setContentAreaFilled(false);
+			button.setBorderPainted(false);
+			mapPanel.add(button);
+		}
 	}
 
 	private BackgroundPanel createMapPanel() {
@@ -461,6 +558,43 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		return campusMap;
 	}
 
+	// class GraphView extends JPanel implements Observer {
+	// UserProfile current = null;
+	// boolean isCal;
+	// public GraphView() {
+	// setLayout(new GridLayout(0,1));
+	// }
+	//
+	// public void update(Observable a, Object o){
+	// if(current == null){
+	// //clear(current);
+	// }
+	// else {
+	// showGraph();
+	// }
+	// }
+	//
+	// public void setCurrent(UserProfile curr, boolean boo)
+	// {
+	// if(curr == null)
+	// return;
+	// else
+	// {
+	// current = curr;
+	// current.addObserver(this);
+	// showGraph();
+	// }
+	// }
+	//
+	// private void showGraph() {
+	//
+	// }
+	//
+	// }
+	//
+	//
+	//
+
 	public class DetailsPanel extends JPanel implements Observer {
 		UserProfile current = null;
 
@@ -469,7 +603,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 
 		public DetailsPanel() {
-			// TODO Auto-generated constructor stub
 			setLayout(new GridLayout(0, 1));
 		}
 
@@ -477,7 +610,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		public void update(Observable arg0, Object arg1) {
 			// TODO Auto-generated method stub
 			if (current == null) {
-				System.out.println("yup");
 				// clear(current);
 			} else {
 				showFields();
@@ -496,12 +628,15 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		private void showFields() {
 			num.setText("Card number:\t\t\t\t" + current.userCard.number);
+			budget.setText("Budget:\t\t\t\t"+current.budgetToString());
 			funds.setText("Funds:\t\t\t\t" + current.fundsToString());
-			expenses.setText("Expenses:\t\t\t\t" + current.expenses);
+			expenses.setText("Expenses:\t\t\t\t" + String.format("%.2f",current.expenses));
 			dayCal.setText("DailyCalories:\t\t\t\t"
 					+ current.dailyCaloriesToString());
+			calRem.setText("Calories Remaining:\t\t\t\t"+current.caloriesRemainingToString());
 			calTod.setText("Calories Today:\t\t\t\t" + current.caloriesToday);
-			otherPref.setText("Other Preferences:\t\t\t\t" + current.otherFoodPrefs);
+			otherPref.setText("Other Preferences:\t\t\t\t"
+					+ current.otherFoodPrefs);
 		}
 
 		private void clear(UserProfile user) {
@@ -513,6 +648,11 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			dayCal.setText("");
 			calTod.setText("");
 			otherPref.setText("");
+			location.setText("");
+			timer.stop();
+			timeLeft.setText("");
+			budget.setText("");
+			calRem.setText("");
 		}
 	}
 }
