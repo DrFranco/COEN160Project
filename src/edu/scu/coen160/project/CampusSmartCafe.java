@@ -28,32 +28,34 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			viewDiet, logOut;
 	JPanel optionsPanel;
 
-	JLabel num, budget, funds, expenses, dayCal, calRem, calTod, otherPref, location, timeLeft;
+	JLabel num, budget, funds, expenses, dayCal, calRem, calTod, otherPref,
+			location, timeLeft;
 	DetailsPanel detailPanel;
-	
+
 	Timer timer;
 
 	Component r1;
 	Component r2;
 
 	Cafe cafe1, cafe2, cafe3, cafe4;
-	VendingMachine vending1,vending2,vending3,vending4,vending5,vending6,vending7,vending8;
+	VendingMachine vending1, vending2, vending3, vending4, vending5, vending6,
+			vending7, vending8;
 
 	// GraphView graphPanel;
 
 	public CampusSmartCafe() {
 		super("CampusSmartCafe");
-		
+
 		cafe1 = new Cafe();
 		cafe1.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
-		
+
 		vending1 = new VendingMachine();
-		vending1.stock.add(new SnackItem("Skittles", 1.29,150));
-		
+		vending1.stock.add(new SnackItem("Skittles", 1.29, 150));
+
 		numbers = new ArrayList<Integer>();
 		users = new ArrayList<UserProfile>();
 		userCards = new ArrayList<Card>();
-		
+
 		timer = new Timer(1000, this);
 		// create map(buttons) map done, still need buttons
 		generateMap();
@@ -147,35 +149,34 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		if (arg.getSource() == newUser) {
 			createAccount();
 		}
-		if (arg.getSource() == logIn) {
+		else if (arg.getSource() == logIn) {
 			logIn();
 		}
-		if (arg.getSource() == enterFunds) {
+		else if (arg.getSource() == enterFunds) {
 			fundHandler();
 		}
-		if (arg.getSource() == enterCal) {
+		else if (arg.getSource() == enterCal) {
 			calHandler();
 		}
-		if (arg.getSource() == enterOther) {
+		else if (arg.getSource() == enterOther) {
 			otherHandler();
 		}
-		if (arg.getSource() == viewExp) {
+		else if (arg.getSource() == viewExp) {
 			expHandler();
 		}
-		if (arg.getSource() == viewDiet) {
+		else if (arg.getSource() == viewDiet) {
 			dietHandler();
 		}
-		if (arg.getSource() == timer) {
+		else if (arg.getSource() == timer) {
 			incrementClock();
 		}
-
-		if (arg.getSource() == logOut) {
+		else if (arg.getSource() == logOut) {
 			logOut();
-		} else {
+		} 
+		else
 			selectHandler(arg.getSource());
-		}
 	}
-	
+
 	private void incrementClock() {
 		if (timeLeft.getText() == "Ready") {
 			timer.stop();
@@ -225,13 +226,14 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				cafe1.orderFood(currentUser, cafe1.names.get(str),
 						currentUser.userCard);
 				location.setText("Location:\t\t\t\tSoup Stop");
-				timeLeft.setText(cafe1.names.get(str).cookingTime+":00");
+				timeLeft.setText(cafe1.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
 		}
 	}
 
 	private void vendingHandler(Object o) {
+		System.out.println(o);
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"You have to log in first!", "Error",
@@ -240,7 +242,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		} else {
 			if (o == v1) {
 				String str = (String) JOptionPane.showInputDialog(
-						getFrames()[0], "Choose an item of food to order",
+						getFrames()[0], "Choose a snack to order",
 						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
 						vending1.toStringArray(), null);
 				try {
@@ -249,21 +251,18 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe1.orderFood(currentUser, cafe1.names.get(str),
+				vending1.orderFood(currentUser, vending1.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
-				timeLeft.setText(cafe1.names.get(str).cookingTime+":00");
-				timer.start();
 			}
 		}
 	}
 
 	private void expHandler() {
-		//graph expenses
+		// graph expenses
 	}
 
 	private void dietHandler() {
-		//graph dietary profile
+		// graph dietary profile
 	}
 
 	private void otherHandler() {
@@ -608,9 +607,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		@Override
 		public void update(Observable arg0, Object arg1) {
-			// TODO Auto-generated method stub
 			if (current == null) {
-				// clear(current);
+				return;
 			} else {
 				showFields();
 			}
@@ -628,12 +626,14 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		private void showFields() {
 			num.setText("Card number:\t\t\t\t" + current.userCard.number);
-			budget.setText("Budget:\t\t\t\t"+current.budgetToString());
+			budget.setText("Budget:\t\t\t\t" + current.budgetToString());
 			funds.setText("Funds:\t\t\t\t" + current.fundsToString());
-			expenses.setText("Expenses:\t\t\t\t" + String.format("%.2f",current.expenses));
+			expenses.setText("Expenses:\t\t\t\t"
+					+ String.format("%.2f", current.expenses));
 			dayCal.setText("DailyCalories:\t\t\t\t"
 					+ current.dailyCaloriesToString());
-			calRem.setText("Calories Remaining:\t\t\t\t"+current.caloriesRemainingToString());
+			calRem.setText("Calories Remaining:\t\t\t\t"
+					+ current.caloriesRemainingToString());
 			calTod.setText("Calories Today:\t\t\t\t" + current.caloriesToday);
 			otherPref.setText("Other Preferences:\t\t\t\t"
 					+ current.otherFoodPrefs);
