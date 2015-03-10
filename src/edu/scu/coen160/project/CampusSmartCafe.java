@@ -50,16 +50,22 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 	VendingMachine vending1, vending2, vending3, vending4, vending5, vending6,
 			vending7, vending8;
 
+	String url = "jdbc:mysql://129.210.16.40:3306/sdb_blarsen";
+	String user = "blarsen";
+	String password = "00000887511";
+
 	// GraphView graphPanel;
 
 	public CampusSmartCafe() {
 		super("CampusSmartCafe");
+
+		numbers = new ArrayList<Integer>();
+		users = new ArrayList<UserProfile>();
+		userCards = new ArrayList<Card>();
+
 		Connection con = null;
 		ResultSet rs = null;
 
-		String url = "jdbc:mysql://129.210.16.40:3306/sdb_blarsen";
-		String user = "blarsen";
-		String password = "00000887511";
 		PreparedStatement pst = null;
 		try {
 			// UserProfile userProf;
@@ -71,9 +77,27 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			rs = pst.executeQuery();
 
 			while (rs.next()) {
-				System.out.print(rs.getString(1));
-				System.out.print(": ");
-				System.out.println(rs.getString(2));
+				UserProfile userProf = new UserProfile(Integer.parseInt(rs
+						.getString(1)), rs.getString(2));
+				try {
+					userProf.setBudget(rs.getDouble(3), rs.getDouble(4));
+				} catch (Exception e) {
+
+				}
+				try {
+					userProf.dailyCalories = rs.getInt(5);
+					userProf.caloriesToday = rs.getInt(6);
+				} catch (Exception e) {
+
+				}
+				try {
+					userProf.otherFoodPrefs = rs.getString(7);
+				} catch (Exception e) {
+
+				}
+				users.add(userProf);
+				userCards.add(userProf.userCard);
+				numbers.add(userProf.userCard.number);
 			}
 
 		} catch (Exception ex) {
@@ -193,10 +217,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		vending8.stock.add(new SnackItem("Chex Mix", 2.00, 100));
 		vending8.stock.add(new SnackItem("Doritos", 2.25, 300));
 		vending8.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
-
-		numbers = new ArrayList<Integer>();
-		users = new ArrayList<UserProfile>();
-		userCards = new ArrayList<Card>();
 
 		timer = new Timer(1000, this);
 		// create map(buttons) map done, still need buttons
@@ -644,6 +664,28 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 	private void logOut() {
 		if (currentUser != null) {
+			Connection conn;
+			PreparedStatement stmt = null;
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+
+				System.out.println("Connecting...");
+				conn = DriverManager.getConnection(url, user, password);
+				System.out.println("Connected");
+				stmt = conn.prepareStatement("UPDATE CampusCard SET Budget = "
+					+ currentUser.budget + ", Funds = " + currentUser.funds
+					+ ", CalLimit = " + currentUser.dailyCalories
+					+ ", CalUsed = " + currentUser.caloriesToday
+					+ ", FoodRestr = '" + currentUser.otherFoodPrefs
+					+ "' WHERE CardNo='" + currentUser.userCard.number
+					+ "'");
+				stmt.executeUpdate();
+				System.out.println("Updated!");
+				conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			detailPanel.clear(currentUser);
 			currentUser = null;
 		}
@@ -684,14 +726,19 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				UserProfile newProf = new UserProfile(number, pass1);
 
 				Connection conn;
-				Statement stmt = null;
+				PreparedStatement stmt = null;
 				try {
 					Class.forName("com.mysql.jdbc.Driver");
 
 					System.out.println("Connecting...");
-					conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
+					conn = DriverManager.getConnection(url, user, password);
+					stmt = conn
+							.prepareStatement("INSERT INTO CampusCard VALUES ("
+									+ String.valueOf(number) + "," + pass1
+									+ ",0,0,0,0,'')");
+					stmt.executeUpdate();
 					System.out.println("Connected!");
+					conn.close();
 				} catch (Exception e) {
 					// do nothing
 				}
@@ -700,9 +747,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				users.add(newProf);
 				userCards.add(newProf.userCard);
 			}
-
-		}
-		if (n == JOptionPane.NO_OPTION) {
+		} else if (n == JOptionPane.NO_OPTION) {
 			UserProfile newProf = new UserProfile();
 			while (userCards != null && userCards.contains(newProf.userCard)) {
 				newProf = new UserProfile();
@@ -710,6 +755,23 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					newProf.userCard.toString(), "New User information",
 					JOptionPane.INFORMATION_MESSAGE);
+			Connection conn;
+			PreparedStatement stmt = null;
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+
+				System.out.println("Connecting...");
+				conn = DriverManager.getConnection(url, user, password);
+				stmt = conn.prepareStatement("INSERT INTO CampusCard VALUES ("
+						+ String.valueOf(newProf.userCard.number) + ",'"
+						+ newProf.userCard.password() + "',0,0,0,0,'')");
+				stmt.executeUpdate();
+				System.out.println("Connected!");
+				conn.close();
+			} catch (Exception e) {
+				// do nothing
+			}
+
 			numbers.add(newProf.userCard.number);
 			users.add(newProf);
 			userCards.add(newProf.userCard);

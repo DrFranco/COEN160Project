@@ -31,4 +31,8 @@ public class Card {
 	public boolean equals(Object o) {
 		return o instanceof Card && ((Card) o).number == this.number;
 	}
+	
+	public String password() {
+		return password;
+	}
 }
