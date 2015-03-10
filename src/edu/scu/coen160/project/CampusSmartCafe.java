@@ -37,7 +37,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 	Component r1;
 	Component r2;
 
-	Cafe cafe1, cafe2, cafe3, cafe4;
+	Cafe cafe1, cafe2, cafe3, cafe4, cafe5;
 	VendingMachine vending1, vending2, vending3, vending4, vending5, vending6,
 			vending7, vending8;
 
@@ -48,9 +48,96 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		cafe1 = new Cafe();
 		cafe1.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
+		cafe1.stock.add(new FoodItem("Tomato Soup", 4.99, 250, 2));
+		cafe1.stock.add(new FoodItem("Tortilla Soup", 3.99, 275, 3));
+		cafe1.stock.add(new FoodItem("Clam Chowder", 5.99, 350, 2));
+
+		cafe2 = new Cafe();
+		cafe2.stock.add(new FoodItem("Dog's Day Sandwich", 5.99, 325, 1));
+		cafe2.stock.add(new FoodItem("Ham Shank", 4.99, 250, 2));
+		cafe2.stock.add(new FoodItem("T-bone steak", 3.99, 275, 3));
+		cafe2.stock.add(new FoodItem("Burger and Fries", 5.99, 350, 2));
+
+		cafe3 = new Cafe();
+		cafe3.stock.add(new FoodItem("Spagetthi and Meatballs", 5.99, 325, 1));
+		cafe3.stock.add(new FoodItem("Spagetthi", 4.99, 250, 2));
+		cafe3.stock.add(new FoodItem("Fettucini Alfredo", 3.99, 275, 3));
+
+		cafe4 = new Cafe();
+		cafe4.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
+		cafe4.stock.add(new FoodItem("Tomato Soup", 4.99, 250, 2));
+		cafe4.stock.add(new FoodItem("Tortilla Soup", 3.99, 275, 3));
+		cafe4.stock.add(new FoodItem("Clam Chowder", 5.99, 350, 2));
+
+		cafe5 = new Cafe();
+		cafe5.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
+		cafe5.stock.add(new FoodItem("Tomato Soup", 4.99, 250, 2));
+		cafe5.stock.add(new FoodItem("Tortilla Soup", 3.99, 275, 3));
+		cafe5.stock.add(new FoodItem("Clam Chowder", 5.99, 350, 2));
 
 		vending1 = new VendingMachine();
 		vending1.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending1.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending1.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending1.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending1.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending1.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending2 = new VendingMachine();
+		vending2.stock.add(new SnackItem("Snickers", 1.29, 150));
+		vending2.stock.add(new SnackItem("Butterfingers", 1.19, 100));
+		vending2.stock.add(new SnackItem("Reese's", 1.39, 175));
+		vending2.stock.add(new SnackItem("Twix", 2.00, 100));
+		vending2.stock.add(new SnackItem("Beef Jerky", 2.25, 300));
+		vending2.stock.add(new SnackItem("Fanta", 1.49, 190));
+
+		vending3 = new VendingMachine();
+		vending3.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending3.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending3.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending3.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending3.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending3.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending4 = new VendingMachine();
+		vending4.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending4.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending4.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending4.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending4.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending4.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending5 = new VendingMachine();
+		vending5.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending5.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending5.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending5.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending5.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending5.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending6 = new VendingMachine();
+		vending6.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending6.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending6.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending6.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending6.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending6.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending7 = new VendingMachine();
+		vending7.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending7.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending7.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending7.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending7.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending7.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
+
+		vending8 = new VendingMachine();
+		vending8.stock.add(new SnackItem("Skittles", 1.29, 150));
+		vending8.stock.add(new SnackItem("M & M's", 1.19, 100));
+		vending8.stock.add(new SnackItem("Heath Bar", 1.39, 175));
+		vending8.stock.add(new SnackItem("Chex Mix", 2.00, 100));
+		vending8.stock.add(new SnackItem("Doritos", 2.25, 300));
+		vending8.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
 
 		numbers = new ArrayList<Integer>();
 		users = new ArrayList<UserProfile>();
@@ -148,32 +235,23 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent arg) {
 		if (arg.getSource() == newUser) {
 			createAccount();
-		}
-		else if (arg.getSource() == logIn) {
+		} else if (arg.getSource() == logIn) {
 			logIn();
-		}
-		else if (arg.getSource() == enterFunds) {
+		} else if (arg.getSource() == enterFunds) {
 			fundHandler();
-		}
-		else if (arg.getSource() == enterCal) {
+		} else if (arg.getSource() == enterCal) {
 			calHandler();
-		}
-		else if (arg.getSource() == enterOther) {
+		} else if (arg.getSource() == enterOther) {
 			otherHandler();
-		}
-		else if (arg.getSource() == viewExp) {
+		} else if (arg.getSource() == viewExp) {
 			expHandler();
-		}
-		else if (arg.getSource() == viewDiet) {
+		} else if (arg.getSource() == viewDiet) {
 			dietHandler();
-		}
-		else if (arg.getSource() == timer) {
+		} else if (arg.getSource() == timer) {
 			incrementClock();
-		}
-		else if (arg.getSource() == logOut) {
+		} else if (arg.getSource() == logOut) {
 			logOut();
-		} 
-		else
+		} else
 			selectHandler(arg.getSource());
 	}
 
@@ -229,11 +307,78 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				timeLeft.setText(cafe1.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
+			if (o == c2) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						cafe2.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe2.orderFood(currentUser, cafe2.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe2.names.get(str).cookingTime + ":00");
+				timer.start();
+			}
+			if (o == c3) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						cafe3.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe3.orderFood(currentUser, cafe3.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe3.names.get(str).cookingTime + ":00");
+				timer.start();
+			}
+			if (o == c4) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						cafe4.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe4.orderFood(currentUser, cafe4.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe4.names.get(str).cookingTime + ":00");
+				timer.start();
+			}
+			if (o == c5) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose an item of food to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						cafe5.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				cafe5.orderFood(currentUser, cafe5.names.get(str),
+						currentUser.userCard);
+				location.setText("Location:\t\t\t\tSoup Stop");
+				timeLeft.setText(cafe5.names.get(str).cookingTime + ":00");
+				timer.start();
+			}
 		}
 	}
 
 	private void vendingHandler(Object o) {
-		System.out.println(o);
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"You have to log in first!", "Error",
@@ -252,6 +397,104 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 					return;
 				}
 				vending1.orderFood(currentUser, vending1.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v2) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending2.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending2.orderFood(currentUser, vending2.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v3) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending3.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending3.orderFood(currentUser, vending3.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v4) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending4.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending4.orderFood(currentUser, vending4.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v5) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending5.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending5.orderFood(currentUser, vending5.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v6) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending6.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending6.orderFood(currentUser, vending6.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v7) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending7.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending7.orderFood(currentUser, vending7.names.get(str),
+						currentUser.userCard);
+			}
+			if (o == v8) {
+				String str = (String) JOptionPane.showInputDialog(
+						getFrames()[0], "Choose a snack to order",
+						"Make an Order", JOptionPane.PLAIN_MESSAGE, null,
+						vending8.toStringArray(), null);
+				try {
+					if (str == null)
+						throw new Exception();
+				} catch (Exception e) {
+					return;
+				}
+				vending8.orderFood(currentUser, vending8.names.get(str),
 						currentUser.userCard);
 			}
 		}
