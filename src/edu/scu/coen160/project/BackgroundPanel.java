@@ -154,7 +154,7 @@ public class BackgroundPanel extends JPanel {
 	 * An easy way to do this it to set the background of the table to a Color
 	 * using an alpha value of 0.
 	 */
-	private void makeComponentTransparent(JComponent component) {
+	public void makeComponentTransparent(JComponent component) {
 		component.setOpaque(false);
 
 		if (component instanceof JScrollPane) {
