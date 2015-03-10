@@ -23,4 +23,6 @@ public class Cafe {
 		else
 			return false;
 	}
+	
+	//need to implement where and when to pick up food
 }
