@@ -23,4 +23,8 @@ public class Card {
 	public boolean checkPassword(int num, String pass) {
 		return (pass == password && num == number);
 	}
+	
+	public String toString(){
+		return "Card number:\t"+number+"\nPassword:\t"+password;
+	}
 }

@@ -2,10 +2,11 @@ package edu.scu.coen160.project;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
 
 import javax.swing.Timer;
 
-public class UserProfile implements ActionListener{
+public class UserProfile extends Observable implements ActionListener{
 	Card userCard;
 	double funds=-1;
 	int dailyCalories = -1;

@@ -18,6 +18,8 @@ import javax.swing.*;
  * Code originally from https://tips4java.wordpress.com/2008/10/12/background-panel/
  * credit to Rob Camick, 2008
  * 
+ * image from http://www.csuchico.edu/maps/campus/images/map-with-labels.jpg
+ * 
  */
 @SuppressWarnings("serial")
 public class BackgroundPanel extends JPanel {
