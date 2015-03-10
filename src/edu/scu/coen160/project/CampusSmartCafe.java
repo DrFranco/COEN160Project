@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,12 +18,12 @@ import javax.swing.border.TitledBorder;
 
 @SuppressWarnings("serial")
 public class CampusSmartCafe extends JFrame implements ActionListener {
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	static final String DB_URL = "jdbc:mysql:dbserver.engr.scu.edu";
-	
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+	static final String DB_URL = "jdbc:mysql://dbserver.engr.scu.edu/sdb_blarsen";
+
 	static final String USER = "blarsen";
 	static final String PASS = "00000887511";
-	
+
 	static ArrayList<Card> userCards;
 	static ArrayList<UserProfile> users;
 	static ArrayList<Integer> numbers;
@@ -52,6 +54,52 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 	public CampusSmartCafe() {
 		super("CampusSmartCafe");
+		Connection con = null;
+		ResultSet rs = null;
+
+		String url = "jdbc:mysql://129.210.16.40:3306/sdb_blarsen";
+		String user = "blarsen";
+		String password = "00000887511";
+		PreparedStatement pst = null;
+		try {
+			// UserProfile userProf;
+
+			Class.forName("com.mysql.jdbc.Driver");
+			System.out.println("pass");
+			con = DriverManager.getConnection(url, user, password);
+			pst = con.prepareStatement("SELECT * FROM CampusCard");
+			rs = pst.executeQuery();
+
+			while (rs.next()) {
+				System.out.print(rs.getString(1));
+				System.out.print(": ");
+				System.out.println(rs.getString(2));
+			}
+
+		} catch (Exception ex) {
+			Logger lgr = Logger.getLogger(CampusSmartCafe.class.getName());
+			lgr.log(Level.SEVERE, ex.getMessage(), ex);
+			System.out.println("help");
+
+		} finally {
+
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pst != null) {
+					pst.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+
+			} catch (SQLException ex) {
+				Logger lgr = Logger.getLogger(CampusSmartCafe.class.getName());
+				lgr.log(Level.WARNING, ex.getMessage(), ex);
+			}
+		}
+		// DROP TABLE IF EXISTS CampusCard;
 
 		cafe1 = new Cafe();
 		cafe1.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
@@ -310,7 +358,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				cafe1.orderFood(currentUser, cafe1.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
+				location.setText("Location:\t\t\t\t" + c1.getText());
 				timeLeft.setText(cafe1.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
@@ -327,7 +375,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				cafe2.orderFood(currentUser, cafe2.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
+				location.setText("Location:\t\t\t\t" + c2.getText());
 				timeLeft.setText(cafe2.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
@@ -344,7 +392,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				cafe3.orderFood(currentUser, cafe3.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
+				location.setText("Location:\t\t\t\t" + c3.getText());
 				timeLeft.setText(cafe3.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
@@ -361,7 +409,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				cafe4.orderFood(currentUser, cafe4.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
+				location.setText("Location:\t\t\t\t" + c4.getText());
 				timeLeft.setText(cafe4.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
@@ -378,7 +426,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				}
 				cafe5.orderFood(currentUser, cafe5.names.get(str),
 						currentUser.userCard);
-				location.setText("Location:\t\t\t\tSoup Stop");
+				location.setText("Location:\t\t\t\t" + c5.getText());
 				timeLeft.setText(cafe5.names.get(str).cookingTime + ":00");
 				timer.start();
 			}
@@ -634,20 +682,20 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 					return;
 				}
 				UserProfile newProf = new UserProfile(number, pass1);
-				
-				Connection conn = null;
+
+				Connection conn;
 				Statement stmt = null;
 				try {
 					Class.forName("com.mysql.jdbc.Driver");
-					
+
 					System.out.println("Connecting...");
 					conn = DriverManager.getConnection(DB_URL, USER, PASS);
-					
+
 					System.out.println("Connected!");
 				} catch (Exception e) {
 					// do nothing
 				}
-				
+
 				numbers.add(number);
 				users.add(newProf);
 				userCards.add(newProf.userCard);
