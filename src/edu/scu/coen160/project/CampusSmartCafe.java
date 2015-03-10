@@ -1,5 +1,6 @@
 package edu.scu.coen160.project;
 
+import java.sql.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,12 @@ import javax.swing.border.TitledBorder;
 
 @SuppressWarnings("serial")
 public class CampusSmartCafe extends JFrame implements ActionListener {
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	static final String DB_URL = "jdbc:mysql:dbserver.engr.scu.edu";
+	
+	static final String USER = "blarsen";
+	static final String PASS = "00000887511";
+	
 	static ArrayList<Card> userCards;
 	static ArrayList<UserProfile> users;
 	static ArrayList<Integer> numbers;
@@ -384,6 +391,20 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 					return;
 				}
 				UserProfile newProf = new UserProfile(number, pass1);
+				
+				Connection conn = null;
+				Statement stmt = null;
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+					
+					System.out.println("Connecting...");
+					conn = DriverManager.getConnection(DB_URL, USER, PASS);
+					
+					System.out.println("Connected!");
+				} catch (Exception e) {
+					// do nothing
+				}
+				
 				numbers.add(number);
 				users.add(newProf);
 				userCards.add(newProf.userCard);
