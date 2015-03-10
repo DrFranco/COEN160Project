@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 public class Card {
-	private int number;
+	public int number;
 	private String password;
 
 	public Card(int num, String str) {
@@ -26,5 +26,9 @@ public class Card {
 	
 	public String toString(){
 		return "Card number:\t"+number+"\nPassword:\t"+password;
+	}
+	
+	public boolean equals(Object o) {
+		return o instanceof Card && ((Card) o).number == this.number;
 	}
 }
