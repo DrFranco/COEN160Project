@@ -1,6 +1,7 @@
 package edu.scu.coen160.project;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,9 +19,18 @@ import javax.swing.border.TitledBorder;
 
 @SuppressWarnings("serial")
 public class CampusSmartCafe extends JFrame implements ActionListener {
+	/* We are currently connecting to a local mySQL db.
+	 * The strings for SCUDC ENGR database connection
+	 * are also provided, but must be run on a Design
+	 * Center computer (firewalls prevent remote access).
+	 */
+	static final String url = "jdbc:mysql://localhost:3306/test";
+	static final String user = "root";
+	static final String password = "";
+	
+	// SCU Design Center Credentials (OLD) //
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://dbserver.engr.scu.edu/sdb_blarsen";
-
 	static final String USER = "blarsen";
 	static final String PASS = "00000887511";
 
@@ -31,18 +41,16 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 	UserProfile currentUser = null;
 
 	JButton v1, v2, v3, v4, v5, v6, v7, v8, c1, c2, c3, c4, c5;
-	JPanel mapPanel;
-
-	JButton newUser, logIn, enterFunds, enterCal, enterOther, viewExp,
-			viewDiet, logOut;
-	JPanel optionsPanel;
+	JButton newUser, logIn, enterFunds, enterCal, enterOther, logOut,
+		clearVals, graphFundsBtn, graphCalsBtn;
+	
+	JPanel mapPanel, chartPanel, optionsPanel;
+	DetailsPanel detailPanel;
 
 	JLabel num, budget, funds, expenses, dayCal, calRem, calTod, otherPref,
 			location, timeLeft;
-	DetailsPanel detailPanel;
 
 	Timer timer;
-
 	Component r1;
 	Component r2;
 
@@ -50,12 +58,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 	VendingMachine vending1, vending2, vending3, vending4, vending5, vending6,
 			vending7, vending8;
 
-	String url = "jdbc:mysql://129.210.16.40:3306/sdb_blarsen";
-	String user = "blarsen";
-	String password = "00000887511";
-
-	// GraphView graphPanel;
-
+	// Constructor to create the GUI //
 	public CampusSmartCafe() {
 		super("CampusSmartCafe");
 
@@ -63,13 +66,11 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		users = new ArrayList<UserProfile>();
 		userCards = new ArrayList<Card>();
 
+		// Attempt to pull data from database
 		Connection con = null;
 		ResultSet rs = null;
-
 		PreparedStatement pst = null;
 		try {
-			// UserProfile userProf;
-
 			Class.forName("com.mysql.jdbc.Driver");
 			System.out.println("pass");
 			con = DriverManager.getConnection(url, user, password);
@@ -82,31 +83,27 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				try {
 					userProf.setBudget(rs.getDouble(3), rs.getDouble(4));
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				}
 				try {
-					userProf.dailyCalories = rs.getInt(5);
-					userProf.caloriesToday = rs.getInt(6);
+					userProf.setCalories(rs.getInt(5), rs.getInt(6));
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				}
 				try {
 					userProf.otherFoodPrefs = rs.getString(7);
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				}
 				users.add(userProf);
 				userCards.add(userProf.userCard);
 				numbers.add(userProf.userCard.number);
 			}
-
 		} catch (Exception ex) {
 			Logger lgr = Logger.getLogger(CampusSmartCafe.class.getName());
 			lgr.log(Level.SEVERE, ex.getMessage(), ex);
 			System.out.println("help");
-
 		} finally {
-
 			try {
 				if (rs != null) {
 					rs.close();
@@ -117,13 +114,11 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				if (con != null) {
 					con.close();
 				}
-
 			} catch (SQLException ex) {
 				Logger lgr = Logger.getLogger(CampusSmartCafe.class.getName());
 				lgr.log(Level.WARNING, ex.getMessage(), ex);
 			}
 		}
-		// DROP TABLE IF EXISTS CampusCard;
 
 		cafe1 = new Cafe();
 		cafe1.stock.add(new FoodItem("Chicken Noodle Soup", 5.99, 325, 1));
@@ -219,9 +214,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		vending8.stock.add(new SnackItem("Mountain Dew", 1.49, 190));
 
 		timer = new Timer(1000, this);
-		// create map(buttons) map done, still need buttons
+
 		generateMap();
-		// create output panel
 
 		// create options panel
 		optionsPanel = new JPanel(new GridLayout(0, 1, 0, 20));
@@ -232,33 +226,41 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		logIn.addActionListener(this);
 		optionsPanel.add(logIn);
 
-		enterFunds = new JButton("Enter funds");
+		enterFunds = new JButton("Enter Funds");
 		enterFunds.addActionListener(this);
 		optionsPanel.add(enterFunds);
 
-		enterCal = new JButton("Enter caloric diet");
+		enterCal = new JButton("Enter Caloric Diet");
 		enterCal.addActionListener(this);
 		optionsPanel.add(enterCal);
 
-		enterOther = new JButton("Enter other diets");
+		enterOther = new JButton("Enter Restrictions");
 		enterOther.addActionListener(this);
 		optionsPanel.add(enterOther);
-
-		viewExp = new JButton("View Expenses");
-		viewExp.addActionListener(this);
-		optionsPanel.add(viewExp);
-
-		viewDiet = new JButton("View Diet");
-		viewDiet.addActionListener(this);
-		optionsPanel.add(viewDiet);
+		
+		graphFundsBtn = new JButton("Funds Chart");
+		graphFundsBtn.addActionListener(this);
+		optionsPanel.add(graphFundsBtn);
+		
+		graphCalsBtn = new JButton("Calories Chart");
+		graphCalsBtn.addActionListener(this);
+		optionsPanel.add(graphCalsBtn);
+		
+		clearVals = new JButton("Clear Currents");
+		clearVals.addActionListener(this);
+		optionsPanel.add(clearVals);
 
 		logOut = new JButton("Logout");
 		logOut.addActionListener(this);
 		optionsPanel.add(logOut);
 
+		// Create details panel (show date here)
+		Date today = new Date(System.currentTimeMillis());
+		SimpleDateFormat df = new SimpleDateFormat("E MM.dd.yyyy");
+		
 		detailPanel = new DetailsPanel();
 		detailPanel.setLayout(new GridLayout(0, 1));
-		detailPanel.setBorder(new TitledBorder("User information"));
+		detailPanel.setBorder(new TitledBorder("User Information (" + df.format(today) + ")"));
 		num = new JLabel("No user currently logged in");
 		budget = new JLabel("");
 		funds = new JLabel("");
@@ -280,14 +282,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		detailPanel.add(otherPref);
 		detailPanel.add(location);
 		detailPanel.add(timeLeft);
-		//
-		// graphPanel = new GraphView();
-		// graphPanel.add(blankSpace());
-		// graphPanel.add(blankSpace());
-		// graphPanel.add(blankSpace());
-		// graphPanel.add(blankSpace());
-		// graphPanel.setBorder(new TitledBorder("Graphs"));
-		// graphPanel.setBounds(new Rectangle(500,500));
+		
+		chartPanel = new JPanel();
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
@@ -295,11 +291,12 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		contentPane.add(mapPanel, BorderLayout.WEST);
 		contentPane.add(optionsPanel, BorderLayout.EAST);
 		contentPane.add(detailPanel, BorderLayout.SOUTH);
-		// contentPane.add(graphPanel, BorderLayout.NORTH);
+		contentPane.add(chartPanel, BorderLayout.NORTH);
 
 		pack();
 	}
 
+	// Main Function to Create GUI //
 	public static void main(String args[]) {
 		CampusSmartCafe cafe = new CampusSmartCafe();
 		cafe.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -318,18 +315,29 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			calHandler();
 		} else if (arg.getSource() == enterOther) {
 			otherHandler();
-		} else if (arg.getSource() == viewExp) {
-			expHandler();
-		} else if (arg.getSource() == viewDiet) {
-			dietHandler();
 		} else if (arg.getSource() == timer) {
 			incrementClock();
+		} else if (arg.getSource() == clearVals) {
+			if (currentUser == null) {
+				JOptionPane.showMessageDialog(null, "Please log in!");
+				return;
+			}
+			currentUser.caloriesToday = 0;
+			currentUser.expenses = 0;
+			currentUser.funds = currentUser.budget;
+			currentUser.caloriesRemaining = currentUser.dailyCalories;
+			detailPanel.setCurrent(currentUser);
+		} else if (arg.getSource() == graphFundsBtn) {
+			drawFundsChart();
+		} else if (arg.getSource() == graphCalsBtn) {
+			drawCalsChart();
 		} else if (arg.getSource() == logOut) {
 			logOut();
 		} else
 			selectHandler(arg.getSource());
 	}
 
+	// Function to adjust the timer
 	private void incrementClock() {
 		if (timeLeft.getText() == "Ready") {
 			timer.stop();
@@ -350,6 +358,64 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			timeLeft.setText(output);
 		}
 	}
+	
+	// Functions to draw the Pie Charts //
+	
+	private void drawFundsChart() {
+		if (currentUser == null) {
+			JOptionPane.showMessageDialog(null, "Please log in!");
+			return;
+		}
+		
+		// Chart for the funds vs. expenses
+		ArrayList<Double> fundValues = new ArrayList<Double>();
+		double fundPercent = Math.floor((currentUser.funds / currentUser.budget) * 100);		
+		double expensePercent = 100 - fundPercent;
+		fundValues.add(fundPercent);
+		fundValues.add(expensePercent);
+		
+		ArrayList<Color> fundColors = new ArrayList<Color>();
+		fundColors.add(Color.BLUE);
+		fundColors.add(Color.RED);
+		
+		PieChart fundsChart = new PieChart(fundValues, fundColors);
+		
+		JFrame graphFrame = new JFrame("Funds Chart");
+		graphFrame.add(fundsChart);
+		graphFrame.add(new JLabel("Funds vs. Expenses"), BorderLayout.NORTH);
+		graphFrame.add(new JLabel("Funds: " + String.valueOf(fundPercent) + "% (blue) | Expenses: " + String.valueOf(expensePercent) +"% (red)"), BorderLayout.SOUTH);
+		graphFrame.setSize(300, 375);
+		graphFrame.setLocationRelativeTo(null);
+		graphFrame.setVisible(true);
+	}
+	
+	public void drawCalsChart() {
+		if (currentUser == null) {
+			JOptionPane.showMessageDialog(null, "Please log in!");
+			return;
+		}
+		
+		// Chart for the calories used vs. calories remaining
+		ArrayList<Double> calValues = new ArrayList<Double>();
+		double calsRemaining = Math.floor(((double) currentUser.caloriesRemaining / (double) currentUser.dailyCalories) * 100);
+		double calsToday = 100 - calsRemaining;
+		calValues.add(calsRemaining);
+		calValues.add(calsToday);
+
+		ArrayList<Color> calColors = new ArrayList<Color>();
+		calColors.add(Color.BLUE);
+		calColors.add(Color.RED);
+
+		PieChart calsChart = new PieChart(calValues, calColors);
+
+		JFrame graphFrame = new JFrame("Calories Chart");
+		graphFrame.add(calsChart);
+		graphFrame.add(new JLabel("Remaining vs. Consumed (Calories)"), BorderLayout.NORTH);
+		graphFrame.add(new JLabel("Remaining: " + String.valueOf(calsRemaining) + "% (blue) | Consumed: " + String.valueOf(calsToday) +"% (red)"), BorderLayout.SOUTH);
+		graphFrame.setSize(300, 375);
+		graphFrame.setLocationRelativeTo(null);
+		graphFrame.setVisible(true);
+	}
 
 	private void selectHandler(Object o) {
 		if (o == c1 || o == c2 || o == c3 || o == c4 || o == c5)
@@ -358,6 +424,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			vendingHandler(o);
 	}
 
+	// Handle cafe requests
 	private void cafeHandler(Object o) {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
@@ -376,11 +443,12 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe1.orderFood(currentUser, cafe1.names.get(str),
-						currentUser.userCard);
+				if (cafe1.orderFood(currentUser, cafe1.names.get(str),
+						currentUser.userCard)) {
 				location.setText("Location:\t\t\t\t" + c1.getText());
 				timeLeft.setText(cafe1.names.get(str).cookingTime + ":00");
 				timer.start();
+				}
 			}
 			if (o == c2) {
 				String str = (String) JOptionPane.showInputDialog(
@@ -393,11 +461,12 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe2.orderFood(currentUser, cafe2.names.get(str),
-						currentUser.userCard);
+				if (cafe2.orderFood(currentUser, cafe2.names.get(str),
+						currentUser.userCard)) {
 				location.setText("Location:\t\t\t\t" + c2.getText());
 				timeLeft.setText(cafe2.names.get(str).cookingTime + ":00");
 				timer.start();
+				}
 			}
 			if (o == c3) {
 				String str = (String) JOptionPane.showInputDialog(
@@ -410,11 +479,12 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe3.orderFood(currentUser, cafe3.names.get(str),
-						currentUser.userCard);
+				if (cafe3.orderFood(currentUser, cafe3.names.get(str),
+						currentUser.userCard)) {
 				location.setText("Location:\t\t\t\t" + c3.getText());
 				timeLeft.setText(cafe3.names.get(str).cookingTime + ":00");
 				timer.start();
+				}
 			}
 			if (o == c4) {
 				String str = (String) JOptionPane.showInputDialog(
@@ -427,11 +497,12 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe4.orderFood(currentUser, cafe4.names.get(str),
-						currentUser.userCard);
+				if (cafe4.orderFood(currentUser, cafe4.names.get(str),
+						currentUser.userCard)) {
 				location.setText("Location:\t\t\t\t" + c4.getText());
 				timeLeft.setText(cafe4.names.get(str).cookingTime + ":00");
 				timer.start();
+				}
 			}
 			if (o == c5) {
 				String str = (String) JOptionPane.showInputDialog(
@@ -444,15 +515,17 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				} catch (Exception e) {
 					return;
 				}
-				cafe5.orderFood(currentUser, cafe5.names.get(str),
-						currentUser.userCard);
+				if (cafe5.orderFood(currentUser, cafe5.names.get(str),
+						currentUser.userCard)) {
 				location.setText("Location:\t\t\t\t" + c5.getText());
 				timeLeft.setText(cafe5.names.get(str).cookingTime + ":00");
 				timer.start();
+				}
 			}
 		}
 	}
 
+	// Handle vending machine requests
 	private void vendingHandler(Object o) {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
@@ -575,14 +648,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 	}
 
-	private void expHandler() {
-		// graph expenses
-	}
-
-	private void dietHandler() {
-		// graph dietary profile
-	}
-
+	// Function to set dietary restrictions
 	private void otherHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
@@ -599,11 +665,11 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			} catch (Exception e) {
 				return;
 			}
-
 			currentUser.addOtherFoodPrefs(str);
 		}
 	}
 
+	// Function to set caloric limit
 	private void calHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
@@ -615,7 +681,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			String str = JOptionPane.showInputDialog(getFrames()[0],
 					"How many calories per day do you want?");
 			try {
-
 				try {
 					if (str == null || (str != null && ("".equals(str)))) {
 						throw new Exception();
@@ -633,6 +698,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 	}
 
+	// Function to set funds
 	private void fundHandler() {
 		if (currentUser == null) {
 			JOptionPane.showMessageDialog(getFrames()[0],
@@ -644,7 +710,6 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			String str = JOptionPane.showInputDialog(getFrames()[0],
 					"How many funds per month do you have?");
 			try {
-
 				try {
 					if (str == null || (str != null && ("".equals(str)))) {
 						throw new Exception();
@@ -662,6 +727,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 	}
 
+	// When the user logs out, save their info to the database
 	private void logOut() {
 		if (currentUser != null) {
 			Connection conn;
@@ -671,7 +737,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 				System.out.println("Connecting...");
 				conn = DriverManager.getConnection(url, user, password);
-				System.out.println("Connected");
+				System.out.println("Connected!");
+				
 				stmt = conn.prepareStatement("UPDATE CampusCard SET Budget = "
 					+ currentUser.budget + ", Funds = " + currentUser.funds
 					+ ", CalLimit = " + currentUser.dailyCalories
@@ -689,9 +756,9 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			detailPanel.clear(currentUser);
 			currentUser = null;
 		}
-
 	}
 
+	// Create a user account, which is saved to the database for persistence
 	private void createAccount() {
 		int n = JOptionPane.showConfirmDialog(getFrames()[0],
 				"Would you like to set your own card number and pasword?",
@@ -730,17 +797,18 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 				try {
 					Class.forName("com.mysql.jdbc.Driver");
 
-					System.out.println("Connecting...");
+					System.out.println("Connecting to save user...");
 					conn = DriverManager.getConnection(url, user, password);
+					System.out.println("Connected!");
 					stmt = conn
 							.prepareStatement("INSERT INTO CampusCard VALUES ("
 									+ String.valueOf(number) + "," + pass1
 									+ ",0,0,0,0,'')");
 					stmt.executeUpdate();
-					System.out.println("Connected!");
+					System.out.println("Updated!");
 					conn.close();
 				} catch (Exception e) {
-					// do nothing
+					e.printStackTrace();
 				}
 
 				numbers.add(number);
@@ -760,16 +828,17 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 
-				System.out.println("Connecting...");
+				System.out.println("Connecting to update user...");
 				conn = DriverManager.getConnection(url, user, password);
+				System.out.println("Connected!");
 				stmt = conn.prepareStatement("INSERT INTO CampusCard VALUES ("
 						+ String.valueOf(newProf.userCard.number) + ",'"
 						+ newProf.userCard.password() + "',0,0,0,0,'')");
 				stmt.executeUpdate();
-				System.out.println("Connected!");
+				System.out.println("Updated!");
 				conn.close();
 			} catch (Exception e) {
-				// do nothing
+				e.printStackTrace();
 			}
 
 			numbers.add(newProf.userCard.number);
@@ -778,6 +847,9 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 	}
 
+	// Log in, setting the currentUser to the specified user
+	// Users are added from the DB to the list of users when the
+	// application starts.
 	private void logIn() {
 		int number = -1;
 		try {
@@ -796,7 +868,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 					"Card number error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		// add error detection
+
 		if (numbers == null || !numbers.contains(number)) {
 			JOptionPane.showMessageDialog(getFrames()[0],
 					"The number you entered does not exist",
@@ -834,12 +906,14 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		c1 = new JButton("Soup Stop");
 		c1.addActionListener(this);
+		c1.setMargin(new Insets(0,0,0,0));
 		mapPanel.add(c1);
 
 		blankSpace(5);
 
 		c2 = new JButton("Lazy Bone");
 		c2.addActionListener(this);
+		c2.setMargin(new Insets(0,0,0,0));
 		mapPanel.add(c2);
 
 		blankSpace(1);
@@ -864,6 +938,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		c3 = new JButton("Selvester's");
 		c3.addActionListener(this);
+		c3.setMargin(new Insets(0,0,0,0));
 		mapPanel.add(c3);
 
 		blankSpace(1);
@@ -894,6 +969,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		c5 = new JButton("Meat Shack");
 		c5.addActionListener(this);
+		c5.setMargin(new Insets(0,0,0,0));
 		mapPanel.add(c5);
 
 		blankSpace(6);
@@ -927,46 +1003,8 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 
 		campusMap = new BackgroundPanel(image);
 		campusMap.setLayout(new GridLayout(10, 10));
-		// campusMap.makeComponentTransparent();
 		return campusMap;
 	}
-
-	// class GraphView extends JPanel implements Observer {
-	// UserProfile current = null;
-	// boolean isCal;
-	// public GraphView() {
-	// setLayout(new GridLayout(0,1));
-	// }
-	//
-	// public void update(Observable a, Object o){
-	// if(current == null){
-	// //clear(current);
-	// }
-	// else {
-	// showGraph();
-	// }
-	// }
-	//
-	// public void setCurrent(UserProfile curr, boolean boo)
-	// {
-	// if(curr == null)
-	// return;
-	// else
-	// {
-	// current = curr;
-	// current.addObserver(this);
-	// showGraph();
-	// }
-	// }
-	//
-	// private void showGraph() {
-	//
-	// }
-	//
-	// }
-	//
-	//
-	//
 
 	public class DetailsPanel extends JPanel implements Observer {
 		UserProfile current = null;
@@ -988,6 +1026,7 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 			}
 		}
 
+		// Set the global value currentUser to the logged-in user
 		public void setCurrent(UserProfile curr) {
 			if (curr == null) {
 				return;
@@ -999,20 +1038,21 @@ public class CampusSmartCafe extends JFrame implements ActionListener {
 		}
 
 		private void showFields() {
-			num.setText("Card number:\t\t\t\t" + current.userCard.number);
-			budget.setText("Budget:\t\t\t\t" + current.budgetToString());
-			funds.setText("Funds:\t\t\t\t" + current.fundsToString());
-			expenses.setText("Expenses:\t\t\t\t"
+			num.setText("Card number: " + current.userCard.number);
+			budget.setText("Budget: " + current.budgetToString());
+			funds.setText("Funds: " + current.fundsToString());
+			expenses.setText("Expenses: "
 					+ String.format("%.2f", current.expenses));
-			dayCal.setText("DailyCalories:\t\t\t\t"
+			dayCal.setText("Daily Calories: "
 					+ current.dailyCaloriesToString());
-			calRem.setText("Calories Remaining:\t\t\t\t"
+			calRem.setText("Calories Remaining: "
 					+ current.caloriesRemainingToString());
-			calTod.setText("Calories Today:\t\t\t\t" + current.caloriesToday);
-			otherPref.setText("Other Preferences:\t\t\t\t"
+			calTod.setText("Calories Today: " + current.caloriesToday);
+			otherPref.setText("Other Preferences: "
 					+ current.otherFoodPrefs);
 		}
 
+		// Helper function to clear (when user logs off)
 		private void clear(UserProfile user) {
 			user.deleteObserver(this);
 			current = null;

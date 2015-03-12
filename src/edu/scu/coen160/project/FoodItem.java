@@ -10,9 +10,8 @@ public class FoodItem extends SnackItem {
 		cookingTime = cook;
 	}
 	
-	
 	@Override
 	public String toString(){
-		return super.toString()+"\ttime:" + cookingTime+"min";
+		return super.toString()+" | time: " + cookingTime+" min(s)";
 	}
 }

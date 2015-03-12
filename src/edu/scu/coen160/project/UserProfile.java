@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 public class UserProfile extends Observable implements ActionListener {
@@ -26,7 +27,6 @@ public class UserProfile extends Observable implements ActionListener {
 		userCard = new Card();
 
 		timer1.start();
-		// timer2.start();
 	}
 
 	UserProfile(int num, String pass) {
@@ -36,7 +36,6 @@ public class UserProfile extends Observable implements ActionListener {
 		userCard = new Card(num, pass);
 
 		timer1.start();
-		// timer2.start();
 	}
 
 	UserProfile(Card c) {
@@ -55,21 +54,22 @@ public class UserProfile extends Observable implements ActionListener {
 			dailyCaloriesSet = false;
 		}
 		dailyCalories = num;
-		caloriesRemaining = num;
+		caloriesRemaining = num - caloriesToday;
 		dailyCaloriesSet = true;
 		setChanged();
 		notifyObservers();
 	}
 
+	// Set the User's funds
 	void addFunds(double num) {
-		funds = num;
+		funds = num - expenses;
 		budget = num;
 		fundsSet = true;
-		// timer2.start();
 		setChanged();
 		notifyObservers();
 	}
 
+	// Set the User's expense variables from the database
 	void setBudget(double bud, double fun) {
 		if (bud > 0) {
 			budget = bud;
@@ -78,8 +78,29 @@ public class UserProfile extends Observable implements ActionListener {
 			expenses = bud - fun;
 		}
 	}
+	
+	// Set the User's caloric variables from the database
+	void setCalories(int cals, int calsToday) {
+		if (cals > 0) {
+			dailyCalories = cals;
+			caloriesToday = calsToday;
+			dailyCaloriesSet = true;
+			caloriesRemaining = cals - calsToday;
+		}
+	}
 
+	// Attempt to make a purchase, returning FALSE if failed
 	boolean makePurchase(SnackItem food, Card c) {
+		if (!fundsSet || funds - food.price <= 0) {
+			JOptionPane.showMessageDialog(null, "Sorry, you do not have enough funds!");
+			return false;
+		}
+		
+		// Allow the user to exceed their caloric limit (but warn them they have!)
+		if (dailyCaloriesSet && caloriesRemaining - food.calories <= 0) {
+			JOptionPane.showMessageDialog(null, "Oops! You have exceeded your caloric limit.");
+		}
+			
 		if (userCard.equals(c)) {
 			if (fundsSet)
 				funds -= food.price;
@@ -109,6 +130,7 @@ public class UserProfile extends Observable implements ActionListener {
 			return false;
 	}
 
+	// Set the User's food preferences
 	void addOtherFoodPrefs(String pref) {
 		if (otherFoodPrefs == null || otherFoodPrefs == "")
 			otherFoodPrefs += pref;
